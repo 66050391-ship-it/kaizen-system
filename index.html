@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบแจ้งงานปรับปรุง Kaizen</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <!-- Google Fonts (Prompt) -->
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f4f7fc;
+      font-family: 'Prompt', 'Segoe UI', sans-serif;
+      color: #333;
+      position: relative;
+    }
+
+    /* 🔑 สไตล์ปุ่ม เข้าสู่ระบบ (Admin / Shop) มุมขวาบน */
+    .top-right-login {
+      position: absolute;
+      top: 20px;
+      right: 25px;
+      z-index: 1000;
+    }
+    .btn-login-nav {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background-color: #ffffff;
+      color: #0066ff;
+      border: 1.5px solid #0066ff;
+      padding: 8px 18px;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s ease-in-out;
+    }
+    .btn-login-nav:hover {
+      background-color: #0066ff;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(0, 102, 255, 0.25);
+      transform: translateY(-2px);
+    }
+
+    /* ปรับแต่งตำแหน่งปุ่มกรณีเปิดในมือถือ */
+    @media (max-width: 576px) {
+      .top-right-login {
+        position: relative;
+        top: 0;
+        right: 0;
+        text-align: center;
+        margin-top: 15px;
+        margin-bottom: -15px;
+      }
+    }
+
+    .card-custom {
+      border: none;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+      background: #ffffff;
+    }
+
+    /* Input Styling */
+    .form-label {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #2d3748;
+      margin-bottom: 6px;
+    }
+    .input-group-custom {
+      position: relative;
+    }
+    .input-group-custom .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #a0aec0;
+      z-index: 10;
+    }
+    .form-control-custom, .form-select-custom {
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      padding: 10px 14px 10px 40px;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+    .form-control-custom:focus, .form-select-custom:focus {
+      border-color: #3182ce;
+      box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+    }
+    .subtext {
+      font-size: 0.8rem;
+      color: #a0aec0;
+      margin-top: 5px;
+    }
+
+    /* Custom Radio Buttons for Job Type */
+    .btn-check:checked + .btn-outline-primary {
+      background-color: #0066ff;
+      border-color: #0066ff;
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(0, 102, 255, 0.25);
+    }
+    .job-type-btn {
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-weight: 500;
+      border: 1px solid #cbd5e0;
+      color: #4a5568;
+      background-color: #f8fafc;
+      transition: all 0.2s;
+    }
+
+    /* Upload Area Dropzone */
+    .upload-zone {
+      border: 2px dashed #cbd5e0;
+      border-radius: 16px;
+      padding: 25px;
+      text-align: center;
+      background-color: #f8fafc;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .upload-zone:hover {
+      border-color: #3182ce;
+      background-color: #ebf8ff;
+    }
+    .upload-icon {
+      font-size: 2.5rem;
+      color: #3182ce;
+      margin-bottom: 10px;
+    }
+    .btn-select-file {
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      padding: 6px 16px;
+      font-weight: 500;
+      font-size: 0.85rem;
+      color: #4a5568;
+    }
+
+    /* Info Box */
+    .info-box {
+      background-color: #ebf8ff;
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: #2b6cb0;
+      font-size: 0.88rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Preview Image Box */
+    .preview-box {
+      width: 80px;
+      height: 80px;
+      border-radius: 12px;
+      object-fit: cover;
+      display: none;
+      border: 2px solid #3182ce;
+    }
+
+    .btn-submit {
+      border-radius: 12px;
+      padding: 12px;
+      font-weight: 600;
+      font-size: 1.05rem;
+      background-color: #0066ff;
+      border: none;
+    }
+    .btn-submit:hover {
+      background-color: #0052cc;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 🔑 ปุ่มเข้าสู่ระบบ (Admin / Shop) มุมขวาบน -->
+  <div class="top-right-login">
+    <a href="login.html" class="btn-login-nav">
+      <i class="fa-solid fa-right-to-bracket"></i> เข้าสู่ระบบ (Admin / Shop)
+    </a>
+  </div>
+
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-xl-7">
+        
+        <!-- Header -->
+        <div class="text-center mb-4">
+          <div class="display-6 fw-bold text-primary mb-1">
+            <i class="fa-solid fa-gears me-2"></i>Kaizen Report
+          </div>
+          <p class="text-muted fs-6">ระบบแจ้งงานปรับปรุงและเสนอความคิดเห็น</p>
+        </div>
+
+        <!-- Alert Notification -->
+        <div id="alertBox" class="alert d-none" role="alert"></div>
+
+        <!-- Form Card -->
+        <div class="card card-custom p-4 p-md-5">
+
+          <form id="kaizenForm">
+            
+            <!-- Section 1: ข้อมูลผู้แจ้งงาน -->
+            <div class="d-flex align-items-center gap-2 mb-3">
+              <i class="fa-solid fa-user text-primary fs-5"></i>
+              <h5 class="fw-bold m-0">ข้อมูลผู้แจ้งงาน</h5>
+            </div>
+
+            <!-- Row 1: ชื่อผู้แจ้ง & แผนก -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label">ชื่อผู้แจ้ง / รหัสพนักงาน <span class="text-danger">*</span></label>
+                <div class="input-group-custom">
+                  <i class="fa-solid fa-user input-icon"></i>
+                  <input type="text" class="form-control form-control-custom" name="reporter_name" placeholder="เช่น นายสมบูรณ์ ฟอร์จจิ้ง / 00001" required>
+                </div>
+                <div class="subtext">ระบุชื่อ-นามสกุล และรหัสพนักงาน (ถ้ามี)</div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">แผนกของคุณ <span class="text-danger">*</span></label>
+                <div class="input-group-custom">
+                  <i class="fa-solid fa-building input-icon"></i>
+                  <select class="form-select form-select-custom" name="department" required>
+                    <option value="" selected disabled>-- เลือกแผนก --</option>
+                    <option value="Production Engineering">Production Engineering (PE)</option>
+                    <option value="Production Forging">Production Forging (FG)</option>
+                    <option value="Production Machine">Production Machine (MC)</option>
+                    <option value="Planning">Planning (PL)</option>
+                    <option value="Engineering">Engineering (EN)</option>
+                    <option value="Quality Control">Quality Control (QC)</option>
+                    <option value="Quality Assurance">Quality Assurance (QA)</option>
+                    <option value="Warehouse">Warehouse (WH)</option>
+                    <option value="Maintenance">Maintenance (MT)</option>
+                    <option value="Human Resources">Human Resources (HR)</option>
+                    <option value="Other">Office (อื่นๆ)</option>
+                  </select>
+                </div>
+                <div class="subtext">เลือกแผนกที่สังกัด</div>
+              </div>
+            </div>
+
+            <!-- Row 2: พื้นที่ & ประเภทงาน -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label">พื้นที่ <span class="text-danger">*</span></label>
+                <div class="input-group-custom">
+                  <i class="fa-solid fa-location-dot input-icon text-danger"></i>
+                  <input type="text" class="form-control form-control-custom" name="location" placeholder="เช่น F-line หรือ โซนโรงอาหาร" required>
+                </div>
+                <div class="subtext">ระบุพื้นที่ / โซน / ไลน์การผลิต</div>
+              </div>
+
+              <!-- เพิ่มปุ่มเลือกประเภทงาน -->
+              <div class="col-md-6">
+                <label class="form-label">ประเภทงาน <span class="text-danger">*</span></label>
+                <div class="d-flex flex-wrap gap-2">
+                  <input type="radio" class="btn-check" name="job_type" id="type_program" value="Program" required>
+                  <label class="btn btn-outline-primary job-type-btn flex-fill text-center" for="type_program"><i class="fa-solid fa-code me-1"></i>Program</label>
+
+                  <input type="radio" class="btn-check" name="job_type" id="type_tooling" value="Tooling">
+                  <label class="btn btn-outline-primary job-type-btn flex-fill text-center" for="type_tooling"><i class="fa-solid fa-wrench me-1"></i>Tooling</label>
+
+                  <input type="radio" class="btn-check" name="job_type" id="type_equipment" value="Equipment">
+                  <label class="btn btn-outline-primary job-type-btn flex-fill text-center" for="type_equipment"><i class="fa-solid fa-gears me-1"></i>Equipment</label>
+
+                  <input type="radio" class="btn-check" name="job_type" id="type_jig" value="Jig fixture">
+                  <label class="btn btn-outline-primary job-type-btn flex-fill text-center" for="type_jig"><i class="fa-solid fa-screwdriver-wrench me-1"></i>Jig fixture</label>
+                </div>
+                <div class="subtext">ระบุประเภทของงาน Kaizen</div>
+              </div>
+            </div>
+
+            <!-- Row 3: หัวข้อเรื่องขอปรับปรุง -->
+            <div class="mb-4">
+              <label class="form-label">หัวข้อเรื่องขอปรับปรุง <span class="text-danger">*</span></label>
+              <div class="input-group-custom">
+                <i class="fa-solid fa-pen input-icon text-primary"></i>
+                <input type="text" class="form-control form-control-custom" name="title" placeholder="เช่น ทำถาดรองถังน้ำมัน coolant (1-ZC K-Line)" required>
+              </div>
+              <div class="subtext">สรุปหัวข้อปัญหาให้สั้นและชัดเจน</div>
+            </div>
+
+            <!-- Section 2: รายละเอียดเพิ่มเติม -->
+            <div class="mb-4">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <i class="fa-solid fa-comment-dots text-primary fs-5"></i>
+                <label class="form-label m-0 fw-bold">รายละเอียดเพิ่มเติม</label>
+              </div>
+              <textarea class="form-control form-control-custom p-3" id="descriptionInput" name="description" rows="3" maxlength="1000" placeholder="อธิบายปัญหา หรือข้อเสนอแนะเพิ่มเติม..."></textarea>
+              <div class="d-flex justify-content-between subtext">
+                <span>อธิบายให้ชัดเจน เพื่อให้ทีมงานเข้าใจปัญหาได้ง่าย</span>
+                <span id="charCounter">0 / 1000</span>
+              </div>
+            </div>
+
+            <!-- Section 3: ถ่ายรูป / อัปโหลดรูปภาพ -->
+            <div class="mb-4">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <i class="fa-solid fa-camera text-primary fs-5"></i>
+                <label class="form-label m-0 fw-bold">ถ่ายรูป / อัปโหลดภาพสภาพปัจจุบัน (Before)</label>
+              </div>
+
+              <!-- Drag & Drop Box -->
+              <div class="upload-zone d-flex flex-column align-items-center justify-content-center" id="dropzone">
+                <input type="file" id="beforeImageInput" name="before_image" accept="image/*" capture="environment" class="d-none">
+                
+                <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+                
+                <div class="d-flex align-items-center gap-3 mb-2 flex-wrap justify-content-center">
+                  <button type="button" class="btn btn-select-file" onclick="document.getElementById('beforeImageInput').click()">
+                    <i class="fa-solid fa-paperclip me-1"></i> เลือกไฟล์
+                  </button>
+                  <span class="text-muted fs-6">ลากไฟล์รูปภาพมาวางที่นี่</span>
+                </div>
+
+                <div class="text-muted style-small" style="font-size: 0.8rem;">
+                  หรือคลิกเพื่อเลือกไฟล์จากอุปกรณ์ของคุณ <br>
+                  รองรับไฟล์ JPG, JPEG, PNG ขนาดไม่เกิน 10MB
+                </div>
+
+                <!-- Preview Thumbnail -->
+                <img id="imagePreview" class="preview-box mt-3" alt="ตัวอย่างรูปภาพ">
+              </div>
+            </div>
+
+            <!-- Info Alert -->
+            <div class="info-box mb-4">
+              <i class="fa-solid fa-circle-info fs-5"></i>
+              <span>สามารถใช้กล้องถ่ายจากมือถือ หรือเลือกไฟล์รูปภาพได้</span>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="btnSubmit" class="btn btn-primary w-100 btn-submit shadow-sm mb-3">
+              <i class="fa-solid fa-paper-plane me-2"></i>ส่งข้อมูลแจ้งงาน Kaizen
+            </button>
+
+            <!-- Footer Lock Note -->
+            <div class="text-center subtext">
+              <i class="fa-solid fa-lock me-1"></i> ข้อมูลของคุณจะถูกเก็บเป็นความลับ และใช้เพื่อการปรับปรุงงานเท่านั้น
+            </div>
+
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    const form = document.getElementById('kaizenForm');
+    const alertBox = document.getElementById('alertBox');
+    const btnSubmit = document.getElementById('btnSubmit');
+    const descInput = document.getElementById('descriptionInput');
+    const charCounter = document.getElementById('charCounter');
+    const fileInput = document.getElementById('beforeImageInput');
+    const previewImg = document.getElementById('imagePreview');
+    const dropzone = document.getElementById('dropzone');
+
+    descInput.addEventListener('input', () => {
+      charCounter.innerText = `${descInput.value.length} / 1000`;
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      showPreview(e.target.files[0]);
+    });
+
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.style.borderColor = '#3182ce';
+      dropzone.style.backgroundColor = '#ebf8ff';
+    });
+
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.style.borderColor = '#cbd5e0';
+      dropzone.style.backgroundColor = '#f8fafc';
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.style.borderColor = '#cbd5e0';
+      dropzone.style.backgroundColor = '#f8fafc';
+      if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        showPreview(e.dataTransfer.files[0]);
+      }
+    });
+
+    function showPreview(file) {
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          previewImg.src = e.target.result;
+          previewImg.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      btnSubmit.disabled = true;
+      btnSubmit.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>กำลังส่งข้อมูล...`;
+
+      const formData = new FormData(form);
+
+      try {
+        const response = await fetch('http://localhost:3000/api/requests', {
+          method: 'POST',
+          body: formData
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          showAlert('success', '✅ ' + result.message + ' (รหัสงานของคุณคือ #' + result.id + ')');
+          form.reset();
+          previewImg.style.display = 'none';
+          charCounter.innerText = '0 / 1000';
+        } else {
+          showAlert('danger', '❌ เกิดข้อผิดพลาด: ' + (result.error || 'ไม่สามารถส่งข้อมูลได้'));
+        }
+      } catch (error) {
+        showAlert('danger', '❌ ไม่สามารถเชื่อมต่อกับ Server ได้ กรุณาเช็คว่า Node.js รันอยู่หรือไม่');
+      } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.innerHTML = `<i class="fa-solid fa-paper-plane me-2"></i>ส่งข้อมูลแจ้งงาน Kaizen`;
+      }
+    });
+
+    function showAlert(type, message) {
+      alertBox.className = `alert alert-${type} mb-4 rounded-3`;
+      alertBox.innerHTML = message;
+      alertBox.classList.remove('d-none');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+
+</body>
+</html>

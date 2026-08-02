@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ดำเนินงานและแนบรูปภาพหลังปรับปรุง (After) - Kaizen Shop</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <!-- Google Fonts (Prompt) -->
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      font-family: 'Prompt', sans-serif;
+      color: #334155;
+    }
+    .card-custom {
+      background: #ffffff;
+      border: 1px solid #f1f5f9;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+      padding: 24px;
+    }
+    .badge-approved {
+      background-color: #dcfce7;
+      color: #15803d;
+      font-weight: 500;
+      padding: 6px 16px;
+      border-radius: 20px;
+    }
+    .badge-job-type {
+      background-color: #e0f2fe;
+      color: #0284c7;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+    }
+    .img-before {
+      max-width: 100%;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      max-height: 320px;
+      object-fit: cover;
+    }
+    .drop-zone {
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 30px;
+      text-align: center;
+      background: #fafafa;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .drop-zone:hover {
+      border-color: #3b82f6;
+      background: #eff6ff;
+    }
+    .btn-completed {
+      background-color: #10b981;
+      color: white;
+      font-weight: 600;
+      padding: 10px 24px;
+      border-radius: 10px;
+      border: none;
+    }
+    .btn-completed:hover {
+      background-color: #059669;
+      color: white;
+    }
+    .info-box-yellow {
+      background-color: #fffbeb;
+      border: 1px solid #fef3c7;
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .info-box-blue {
+      background-color: #eff6ff;
+      border: 1px solid #dbeafe;
+      border-radius: 12px;
+      padding: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid px-4 py-4" style="max-width: 1300px;">
+
+    <!-- Top Header Status & Back Button -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+      <div class="d-flex align-items-center gap-3">
+        <!-- 📌 ปุ่มกลับไปหน้าเลือกงาน (shop.html) -->
+        <a href="shop.html" class="btn btn-outline-secondary btn-sm px-3 rounded-3">
+          <i class="fa-solid fa-arrow-left me-1"></i> กลับไปหน้าเลือกงาน
+        </a>
+        <h5 class="fw-bold text-dark m-0">ดำเนินงานและแนบรูปภาพหลังปรับปรุง (After) เพื่อปิดงาน</h5>
+      </div>
+      <span class="badge-approved"><i class="fa-solid fa-check me-1"></i> Approved (รอดำเนินการ)</span>
+    </div>
+
+    <form id="completeJobForm">
+      <div class="row g-4">
+        
+        <!-- Left Column: รายละเอียดงาน & ภาพ Before -->
+        <div class="col-12 col-lg-6">
+          <div class="card-custom h-100">
+            <h6 class="fw-bold text-dark mb-4"><i class="fa-regular fa-file-lines text-primary me-2"></i>รายละเอียดงาน</h6>
+            
+            <div class="row g-3 mb-3">
+              <div class="col-6 col-md-3">
+                <small class="text-muted d-block">รหัสงาน (ID)</small>
+                <span class="fw-bold text-primary" id="lblId">#KR-2025-0000</span>
+              </div>
+              <div class="col-6 col-md-3">
+                <small class="text-muted d-block">วันที่แจ้งงาน</small>
+                <span class="fw-bold text-dark small" id="lblCreated">--/--/----</span>
+              </div>
+              <div class="col-6 col-md-3">
+                <small class="text-muted d-block">ผู้แจ้ง</small>
+                <span class="fw-bold text-dark small" id="lblReporter">-</span>
+              </div>
+              <div class="col-6 col-md-3">
+                <small class="text-muted d-block">แผนก</small>
+                <span class="fw-bold text-dark small" id="lblDept">-</span>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-6 col-md-3">
+                <small class="text-muted d-block">ประเภทงาน</small>
+                <span class="badge-job-type" id="lblJobType">ทั่วไป</span>
+              </div>
+              <div class="col-6 col-md-4">
+                <small class="text-muted d-block">พื้นที่/เครื่องจักร</small>
+                <span class="fw-bold text-dark small" id="lblLocation">-</span>
+              </div>
+              <div class="col-12 col-md-5">
+                <small class="text-muted d-block">หัวข้อปรับปรุง</small>
+                <span class="fw-bold text-dark small" id="lblTitle">-</span>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <small class="text-muted d-block mb-1">รายละเอียดเพิ่มเติม</small>
+              <div class="p-3 bg-light rounded text-dark small" id="lblDesc">-</div>
+            </div>
+
+            <hr class="text-muted opacity-25">
+
+            <div>
+              <h6 class="fw-bold text-dark mb-3"><i class="fa-regular fa-image text-primary me-2"></i>ภาพ Before</h6>
+              <div class="text-center" id="beforeImgContainer">
+                <span class="text-muted small">ไม่มีภาพประกอบ</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: ดำเนินงานหลังปรับปรุง (After) -->
+        <div class="col-12 col-lg-6">
+          <div class="card-custom h-100 d-flex flex-column justify-content-between">
+            <div>
+              <h6 class="fw-bold text-dark mb-4"><i class="fa-solid fa-wrench text-success me-2"></i>ดำเนินงานหลังปรับปรุง (After)</h6>
+
+              <!-- รายละเอียดการดำเนินการ -->
+              <div class="mb-3">
+                <label class="form-label fw-bold small text-dark">รายละเอียดการดำเนินการ <span class="text-danger">*</span></label>
+                <textarea class="form-control" id="actionDetails" rows="4" placeholder="อธิบายการดำเนินงานหลังปรับปรุง..." required></textarea>
+              </div>
+
+              <!-- แนบรูปภาพ After -->
+              <div class="mb-4">
+                <label class="form-label fw-bold small text-dark">แนบรูปภาพ After <span class="text-danger">*</span></label>
+                <div class="drop-zone" onclick="document.getElementById('afterImageInput').click()">
+                  <i class="fa-solid fa-cloud-arrow-up fs-2 text-primary mb-2"></i>
+                  <div class="fw-bold small text-dark">คลิกเพื่อเลือกไฟล์ภาพ</div>
+                  <div class="text-muted style-small" style="font-size: 0.75rem;" id="fileNameDisplay">รองรับไฟล์ JPG, PNG ขนาดไม่เกิน 10MB</div>
+                  <input type="file" id="afterImageInput" accept="image/*" class="d-none" onchange="showFileName(this)" required>
+                </div>
+              </div>
+
+              <!-- วันที่ดำเนินการ & ผู้ดำเนินการ -->
+              <div class="row g-3">
+                <div class="col-6">
+                  <label class="form-label fw-bold small text-dark">วันที่ดำเนินการ <span class="text-danger">*</span></label>
+                  <input type="date" id="actionDate" class="form-control form-control-sm" required>
+                </div>
+                <div class="col-6">
+                  <label class="form-label fw-bold small text-dark">ผู้ดำเนินการ <span class="text-danger">*</span></label>
+                  <input type="text" id="operatorName" class="form-control form-control-sm" placeholder="ระบุชื่อผู้ช่าง/ผู้ดำเนินการ" required>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Bottom Row: สถานะ & ปุ่มกดปิดงาน -->
+        <div class="col-12">
+          <div class="row g-3 align-items-center">
+            <div class="col-12 col-md-4">
+              <div class="info-box-yellow">
+                <div class="fw-bold text-warning-emphasis small mb-1"><i class="fa-solid fa-circle-exclamation me-1"></i> รอดำเนินการ</div>
+                <div class="text-muted style-small" style="font-size: 0.75rem;"> Approved งานแล้ว อยู่ระหว่างทางทีม Kaizen Shop แก้ไข</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="info-box-blue">
+                <div class="fw-bold text-primary small mb-1"><i class="fa-solid fa-circle-info me-1"></i> หมายเหตุ</div>
+                <div class="text-muted style-small" style="font-size: 0.75rem;">เมื่อกดปุ่ม "ปิดงาน" งานนี้จะถูกเปลี่ยนสถานะเป็น Completed และส่งไปยัง Admin ทันที</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4 text-end d-flex justify-content-end gap-2">
+              <a href="shop.html" class="btn btn-outline-secondary px-4 rounded-3" style="font-weight: 500;">ยกเลิก</a>
+              <button type="submit" class="btn-completed"><i class="fa-solid fa-check me-2"></i>ปิดงาน (Completed)</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </form>
+
+  </div>
+
+  <script>
+    // ดึง Request ID จาก URL Parameter (เช่น shop-detail.html?id=5)
+    const urlParams = new URLSearchParams(window.location.search);
+    const requestId = urlParams.get('id');
+
+    window.addEventListener('DOMContentLoaded', () => {
+      // ตั้งค่าวันที่ปัจจุบันให้อัตโนมัติในช่องวันที่ดำเนินการ
+      document.getElementById('actionDate').valueAsDate = new Date();
+      
+      if (requestId) {
+        fetchJobDetail();
+      } else {
+        alert('ไม่พบรหัสงาน (ID) กรุณาเลือกงานจากหน้า Dashboard');
+      }
+    });
+
+    async function fetchJobDetail() {
+      try {
+        const res = await fetch(`http://localhost:3000/api/requests/${requestId}`);
+        if (!res.ok) throw new Error('ไม่สามารถดึงข้อมูลจาก Server ได้');
+
+        const item = await res.json();
+        console.log("ข้อมูลงานที่ดึงได้:", item); // สามารถกด F12 ดูใน Console ได้
+
+        // ฟอร์แมตวันที่แจ้งงานให้อ่านง่าย (วัน/เดือน/ปี)
+        let createdDate = '--/--/----';
+        if (item.created_at) {
+          const d = new Date(item.created_at);
+          createdDate = d.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+
+        // แสดงผลข้อมูลลงในหน้าเว็บ
+        document.getElementById('lblId').innerText = `#KR-2025-${String(item.id).padStart(4, '0')}`;
+        document.getElementById('lblCreated').innerText = createdDate;
+        document.getElementById('lblReporter').innerText = item.reporter_name || item.reporter || '-';
+        document.getElementById('lblDept').innerText = item.department || '-';
+        document.getElementById('lblJobType').innerText = item.job_type || 'ทั่วไป';
+        document.getElementById('lblLocation').innerText = item.location || '-';
+        document.getElementById('lblTitle').innerText = item.title || '-';
+        document.getElementById('lblDesc').innerText = item.description || '-';
+        
+        // แสดงรูป Before (ถ้ามี)
+        if (item.before_image) {
+          document.getElementById('beforeImgContainer').innerHTML = `<img src="http://localhost:3000${item.before_image}" class="img-before">`;
+        } else {
+          document.getElementById('beforeImgContainer').innerHTML = `<span class="text-muted small">ไม่มีภาพประกอบ</span>`;
+        }
+
+      } catch (err) {
+        console.error('Error fetching job detail:', err);
+        alert('เกิดข้อผิดพลาดในการดึงข้อมูลงาน');
+      }
+    }
+
+    function showFileName(input) {
+      if (input.files && input.files[0]) {
+        document.getElementById('fileNameDisplay').innerHTML = `<b class="text-success"><i class="fa-solid fa-file-image me-1"></i> ${input.files[0].name}</b>`;
+      }
+    }
+
+    // กดยืนยันปิดงาน
+    document.getElementById('completeJobForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData();
+      formData.append('action_details', document.getElementById('actionDetails').value);
+      formData.append('action_date', document.getElementById('actionDate').value);
+      formData.append('operator_name', document.getElementById('operatorName').value);
+      
+      const fileInput = document.getElementById('afterImageInput');
+      if (fileInput.files[0]) {
+        formData.append('after_image', fileInput.files[0]);
+      }
+
+      try {
+        const response = await fetch(`http://localhost:3000/api/requests/${requestId}/complete`, {
+          method: 'POST',
+          body: formData
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          alert('✅ ปิดงานสำเร็จ! ส่งข้อมูลไปยัง Admin เรียบร้อยแล้ว');
+          window.location.href = 'shop.html';
+        } else {
+          alert('เกิดข้อผิดพลาด: ' + result.error);
+        }
+      } catch (error) {
+        alert('ไม่สามารถเชื่อมต่อกับ Server เพื่อปิดงานได้');
+      }
+    });
+  </script>
+
+</body>
+</html>
