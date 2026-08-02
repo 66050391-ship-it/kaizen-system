@@ -197,11 +197,16 @@ app.post('/api/requests/:id/complete', upload.single('after_image'), (req, res) 
     res.json({ message: 'ปิดงาน (Completed) สำเร็จแล้ว!' });
   });
 });
-// ถ้าเข้าหน้าแรกเปล่าๆ ให้ส่งไปที่หน้า login.html (หรือ index.html)
+const path = require('path');
+
+// 1. สั่งให้ Express อ่านไฟล์ static (HTML, CSS, รูปภาพ) จากโฟลเดอร์หลัก
+app.use(express.static(__dirname));
+
+// 2. ถ้ามีคนกดเข้า URL หน้าแรกเปล่าๆ ให้ส่งไปที่หน้า index.html (หรือ login.html)
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'login.html')); 
-    // ^ เปลี่ยน 'login.html' เป็นชื่อไฟล์หน้าแรกของคุณได้เลยครับ
+    res.sendFile(path.join(__dirname, 'index.html')); 
 });
+
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
