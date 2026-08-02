@@ -341,7 +341,7 @@
 
     async function fetchJobs() {
       try {
-        const response = await fetch('http://localhost:3000/api/requests');
+        const response = await fetch('/api/requests');
         const data = await response.json();
         
         // กรองเอาเฉพาะงานที่ Admin อนุมัติแล้ว (Approved) หรือปิดงานแล้ว (Completed)
@@ -422,7 +422,7 @@
         const urgentCardClass = isUrgent ? 'job-card-urgent' : '';
 
         const imgHtml = item.before_image 
-          ? `<img src="http://localhost:3000${item.before_image}" class="img-preview">`
+          ? `<img src="${item.before_image}" class="img-preview">`
           : `<div class="no-img"><i class="fa-regular fa-image fs-3 me-2"></i>ไม่มีรูป Before</div>`;
 
         let actionButtonHtml = '';
@@ -495,7 +495,7 @@
 
       // รูป Before
       document.getElementById('docImgBefore').src = item.before_image 
-        ? `http://localhost:3000${item.before_image}` 
+        ? `${item.before_image}` 
         : 'https://via.placeholder.com/200x140?text=No+Before+Image';
 
       // 2. ใส่ข้อมูลส่วน Kaizen Shop
@@ -507,7 +507,7 @@
 
       // รูป After
       document.getElementById('docImgAfter').src = item.after_image 
-        ? `http://localhost:3000${item.after_image}` 
+        ? `${item.after_image}` 
         : 'https://via.placeholder.com/200x140?text=No+After+Image';
 
       // 3. เรียกเปิด Modal
@@ -524,7 +524,7 @@
     }
 
     async function logout() {
-      await fetch('http://localhost:3000/api/logout', { method: 'POST' });
+      await fetch('/api/logout', { method: 'POST' });
       window.location.href = 'login.html';
     }
   </script>

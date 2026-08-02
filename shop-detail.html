@@ -243,7 +243,7 @@
 
     async function fetchJobDetail() {
       try {
-        const res = await fetch(`http://localhost:3000/api/requests/${requestId}`);
+        const res = await fetch(`/api/requests/${requestId}`);
         if (!res.ok) throw new Error('ไม่สามารถดึงข้อมูลจาก Server ได้');
 
         const item = await res.json();
@@ -268,7 +268,7 @@
         
         // แสดงรูป Before (ถ้ามี)
         if (item.before_image) {
-          document.getElementById('beforeImgContainer').innerHTML = `<img src="http://localhost:3000${item.before_image}" class="img-before">`;
+          document.getElementById('beforeImgContainer').innerHTML = `<img src="${item.before_image}" class="img-before">`;
         } else {
           document.getElementById('beforeImgContainer').innerHTML = `<span class="text-muted small">ไม่มีภาพประกอบ</span>`;
         }
@@ -300,7 +300,7 @@
       }
 
       try {
-        const response = await fetch(`http://localhost:3000/api/requests/${requestId}/complete`, {
+        const response = await fetch(`/api/requests/${requestId}/complete`, {
           method: 'POST',
           body: formData
         });

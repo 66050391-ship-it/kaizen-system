@@ -507,7 +507,7 @@
 
     async function fetchRequests() {
       try {
-        const response = await fetch('http://localhost:3000/api/requests');
+        const response = await fetch('/api/requests');
         allRequests = await response.json();
 
         populateDepartmentDropdown();
@@ -593,7 +593,7 @@
         const formattedId = `#KR-2026-${String(item.id).padStart(4, '0')}`;
 
         const beforeImgHtml = item.before_image
-          ? `<a href="http://localhost:3000${item.before_image}" target="_blank"><img src="http://localhost:3000${item.before_image}" class="img-thumb" title="ดูรูปใหญ่"></a>`
+          ? `<a href="${item.before_image}" target="_blank"><img src="${item.before_image}" class="img-thumb" title="ดูรูปใหญ่"></a>`
           : '<span class="text-muted small">ไม่มีรูป</span>';
 
         // Status Badge
@@ -711,7 +711,7 @@
       const isUrgent = document.getElementById('isUrgentSwitch').checked;
 
       try {
-        const response = await fetch(`http://localhost:3000/api/requests/${id}/${actionType}`, {
+        const response = await fetch(`/api/requests/${id}/${actionType}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -757,7 +757,7 @@
       const imgBefore = document.getElementById('modalImgBefore');
       if (imgBefore) {
         imgBefore.src = item.before_image
-          ? `http://localhost:3000${item.before_image}`
+          ? `${item.before_image}`
           : 'https://via.placeholder.com/300x200?text=No+Before+Image';
       }
 
@@ -775,7 +775,7 @@
           const imgAfter = document.getElementById('modalImgAfter');
           if (imgAfter) {
             imgAfter.src = item.after_image
-              ? `http://localhost:3000${item.after_image}`
+              ? `${item.after_image}`
               : 'https://via.placeholder.com/300x200?text=No+After+Image';
           }
         } else {
@@ -800,7 +800,7 @@
     }
 
     async function logout() {
-      await fetch('http://localhost:3000/api/logout', { method: 'POST' });
+      await fetch('/api/logout', { method: 'POST' });
       window.location.href = 'login.html';
     }
   </script>
