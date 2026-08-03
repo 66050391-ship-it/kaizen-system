@@ -217,15 +217,16 @@
     </div>
 
   </div>
-  <div class="d-flex justify-content-end gap-2 mt-3 mb-3">
+  <!-- ปุ่มสำรองข้อมูลและสั่งลบงาน -->
+  <div class="d-flex justify-content-end gap-2 my-3">
     <!-- ปุ่มดาวน์โหลด PDF -->
-    <button onclick="downloadClosedJobsPDF()" class="btn btn-primary btn-sm shadow-sm"
+    <button id="btnDownloadPDF" type="button" class="btn btn-primary btn-sm shadow-sm"
       style="font-size: 0.85rem; border-radius: 8px;">
       📄 ดาวน์โหลด PDF สำรองข้อมูล
     </button>
 
     <!-- ปุ่มสั่งลบข้อมูล -->
-    <button onclick="deleteClosedJobs()" class="btn btn-outline-danger btn-sm shadow-sm"
+    <button id="btnDeleteJobs" type="button" class="btn btn-outline-danger btn-sm shadow-sm"
       style="font-size: 0.85rem; border-radius: 8px;">
       🗑️ ลบข้อมูลงานที่ปิดแล้ว (เกิน 1 เดือน)
     </button>
@@ -589,6 +590,43 @@
       await fetch('/api/logout', { method: 'POST' });
       window.location.href = 'login.html';
     }
+    // ดึงปุ่มมาผูกกับ Event การกด (Click)
+    document.addEventListener('DOMContentLoaded', () => {
+
+      // 1. ระบบกดดาวน์โหลด PDF
+      const btnDownload = document.getElementById('btnDownloadPDF');
+      if (btnDownload) {
+        btnDownload.addEventListener('click', () => {
+          if (confirm("ต้องการดาวน์โหลดรายงาน PDF สำรองข้อมูลสำหรับงานที่ปิดแล้วทั้งหมดหรือไม่?")) {
+            window.open('/api/admin/closed-jobs-pdf', '_blank');
+          }
+        });
+      }
+
+      // 2. ระบบกดสั่งลบข้อมูล
+      const btnDelete = document.getElementById('btnDeleteJobs');
+      if (btnDelete) {
+        btnDelete.addEventListener('click', async () => {
+          const confirmDelete = confirm(
+            "⚠️ คำเตือน!\n\nคุณได้ดาวน์โหลดไฟล์ PDF สำรองข้อมูลไว้แล้วใช่หรือไม่?\nการกดตกลงจะทำการลบข้อมูลงานที่ปิดแล้วเกิน 1 เดือนออกจากระบบอย่างถาวร!"
+          );
+
+          if (confirmDelete) {
+            try {
+              const response = await fetch('/api/admin/clean-closed-jobs', { method: 'DELETE' });
+              const data = await response.json();
+
+              alert(data.message);
+              location.reload(); // รีเฟรชหน้าเว็บเพื่ออัปเดตข้อมูล
+            } catch (error) {
+              console.error('Error:', error);
+              alert("❌ เกิดข้อผิดพลาด ไม่สามารถลบข้อมูลได้");
+            }
+          }
+        });
+      }
+
+    });
   </script>
 
 </body>
