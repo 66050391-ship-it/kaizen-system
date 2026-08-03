@@ -239,22 +239,21 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html')); 
 });
 // =========================================================
-// 💡 API สำหรับสร้างหน้า PDF สำรองข้อมูลงานที่ปิดแล้ว
+// 📄 API ดาวน์โหลด PDF (พร้อมรูปภาพ Before & After)
 // =========================================================
 app.get('/api/admin/closed-jobs-pdf', (req, res) => {
     const sql = `
         SELECT * FROM kaizen_requests 
-        WHERE status IN ('ปิดงานแล้ว', 'CLOSED_FOREMAN', 'อนุมัติแล้ว') 
+        WHERE status IN ('Completed', 'CLOSED', 'ปิดงานแล้ว', 'CLOSED_FOREMAN', 'อนุมัติแล้ว') 
         ORDER BY created_at DESC
     `;
 
     db.query(sql, (err, results) => {
         if (err) {
             console.error('❌ Database error:', err);
-            return res.status(500).send('เกิดข้อผิดพลาดในการดึงข้อมูลจากฐานข้อมูล');
+            return res.status(500).send('เกิดข้อผิดพลาดในการดึงข้อมูล');
         }
 
-        // สร้างหน้า HTML รายงานสำหรับสั่งพิมพ์/บันทึก PDF
         let html = `
         <!DOCTYPE html>
         <html lang="th">
@@ -268,19 +267,35 @@ app.get('/api/admin/closed-jobs-pdf', (req, res) => {
                 .header h2 { margin: 0; color: #0f172a; }
                 .header p { margin: 5px 0; color: #64748b; font-size: 13px; }
                 table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-                th, td { border: 1px solid #cbd5e1; padding: 8px 10px; font-size: 12px; text-align: left; }
+                th, td { border: 1px solid #cbd5e1; padding: 8px 10px; font-size: 12px; text-align: center; vertical-align: middle; }
                 th { background-color: #f1f5f9; color: #334155; font-weight: 600; }
                 tr:nth-child(even) { background-color: #f8fafc; }
                 .badge-success { color: #16a34a; font-weight: 600; }
+                
+                /* จัดขนาดรูปภาพสำหรับพิมพ์ */
+                .job-img {
+                    width: 65px;
+                    height: 65px;
+                    object-fit: cover;
+                    border-radius: 6px;
+                    border: 1px solid #cbd5e1;
+                }
+                .no-img {
+                    color: #94a3b8;
+                    font-size: 11px;
+                    font-style: italic;
+                }
+
                 @media print {
                     @page { size: A4 landscape; margin: 10mm; }
                     .no-print { display: none; }
+                    img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
                 }
             </style>
         </head>
         <body>
             <div class="no-print" style="text-align: right; margin-bottom: 15px;">
-                <button onclick="window.print()" style="padding: 8px 16px; background: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer; font-family: 'Prompt';">
+                <button onclick="window.print()" style="padding: 8px 16px; background: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer; font-family: 'Prompt'; font-size: 14px;">
                     🖨️ บันทึกเป็น PDF / พิมพ์
                 </button>
             </div>
@@ -293,31 +308,48 @@ app.get('/api/admin/closed-jobs-pdf', (req, res) => {
             <table>
                 <thead>
                     <tr>
-                        <th>รหัสงาน</th>
-                        <th>ชื่อผู้แจ้ง</th>
-                        <th>แผนก</th>
-                        <th>พื้นที่/เครื่องจักร</th>
-                        <th>ประเภทงาน</th>
-                        <th>สถานะ</th>
-                        <th>วันที่แจ้งงาน</th>
+                        <th style="width: 9%;">รหัสงาน</th>
+                        <th style="width: 10%;">รูป Before</th>
+                        <th style="width: 10%;">รูป After</th>
+                        <th style="width: 11%;">ชื่อผู้แจ้ง</th>
+                        <th style="width: 12%;">แผนก</th>
+                        <th style="width: 13%;">พื้นที่/เครื่องจักร</th>
+                        <th style="width: 20%;">หัวข้อ / รายละเอียดการแก้ไข</th>
+                        <th style="width: 7%;">สถานะ</th>
+                        <th style="width: 8%;">วันที่แจ้งงาน</th>
                     </tr>
                 </thead>
                 <tbody>
         `;
 
         if (!results || results.length === 0) {
-            html += `<tr><td colspan="7" style="text-align:center;">ไม่พบข้อมูลงานที่ปิดแล้วในระบบ</td></tr>`;
+            html += `<tr><td colspan="9" style="text-align:center;">ไม่พบข้อมูลงานที่ปิดแล้วในระบบ</td></tr>`;
         } else {
             results.forEach(row => {
                 const dateStr = row.created_at ? new Date(row.created_at).toLocaleDateString('th-TH') : '-';
+                
+                // ตรวจสอบพาธรูปภาพ ก่อน และ หลัง
+                const beforeImgHtml = row.before_image 
+                    ? `<img src="${row.before_image}" class="job-img" alt="Before" onerror="this.outerHTML='<span class=\\'no-img\\'>โหลดรูปไม่ได้</span>'">` 
+                    : `<span class="no-img">ไม่มีรูป</span>`;
+
+                const afterImgHtml = row.after_image 
+                    ? `<img src="${row.after_image}" class="job-img" alt="After" onerror="this.outerHTML='<span class=\\'no-img\\'>โหลดรูปไม่ได้</span>'">` 
+                    : `<span class="no-img">ไม่มีรูป</span>`;
+
                 html += `
                     <tr>
                         <td><b>#KR-${row.id.toString().padStart(4, '0')}</b></td>
-                        <td>${row.reporter_name || '-'}</td>
-                        <td>${row.department || '-'}</td>
-                        <td>${row.location || '-'}</td>
-                        <td>${row.job_type || row.work_type || '-'}</td>
-                        <td><span class="badge-success">${row.status}</span></td>
+                        <td>${beforeImgHtml}</td>
+                        <td>${afterImgHtml}</td>
+                        <td style="text-align: left;">${row.reporter_name || '-'}</td>
+                        <td style="text-align: left;">${row.department || '-'}</td>
+                        <td style="text-align: left;">${row.location || '-'}</td>
+                        <td style="text-align: left;">
+                            <b>${row.title || '-'}</b>
+                            <br><small style="color: #64748b;">${row.action_details || row.description || '-'}</small>
+                        </td>
+                        <td><span class="badge-success">ปิดงานแล้ว</span></td>
                         <td>${dateStr}</td>
                     </tr>
                 `;
@@ -329,9 +361,9 @@ app.get('/api/admin/closed-jobs-pdf', (req, res) => {
             </table>
 
             <script>
-                // สั่งเปิดหน้าต่างสั่งพิมพ์ (Save PDF) อัตโนมัติเมื่อโหลดหน้าเสร็จ
+                // หน่วงเวลา 1 วินาที ให้รูปภาพโหลดเสร็จสมบูรณ์ก่อนเปิดหน้าต่างสั่งพิมพ์
                 window.onload = function() {
-                    setTimeout(() => { window.print(); }, 500);
+                    setTimeout(() => { window.print(); }, 1000);
                 };
             </script>
         </body>
