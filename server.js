@@ -28,6 +28,11 @@ const db = mysql.createPool({
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASS || '',
   database: process.env.DB_NAME || 'kaizen_db',
+  port: process.env.DB_PORT || 4000, // 👈 เพิ่มบรรทัดนี้ (พอร์ตของ TiDB)
+  ssl: {                              // 👈 เพิ่มการเข้ารหัส SSL ตรงนี้
+    minVersion: 'TLSv1.2',
+    rejectUnauthorized: true
+  },
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
