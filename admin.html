@@ -79,6 +79,7 @@
     /* Table Styling */
     .table> :not(caption)>*>* {
       padding: 14px 16px;
+      vertical-align: middle;
     }
 
     .table thead th {
@@ -87,6 +88,7 @@
       color: #64748b;
       background-color: #fafafa;
       border-bottom: 1px solid #f1f5f9;
+      white-space: nowrap;
     }
 
     .img-thumb {
@@ -103,6 +105,8 @@
       font-weight: 500;
       padding: 5px 10px;
       border-radius: 6px;
+      display: inline-block;
+      white-space: nowrap;
     }
 
     .badge-quality {
@@ -130,36 +134,38 @@
       color: #475569;
     }
 
-    .badge-status-pending {
-      background-color: #fef3c7;
-      color: #d97706;
+    /* Badge Status (แก้ไข: ป้องกันข้อความเด้งเป็นแนวตั้ง) */
+    .badge-status-pending,
+    .badge-status-approved,
+    .badge-status-completed,
+    .badge-status-rejected {
+      display: inline-block !important;
+      white-space: nowrap !important;
       font-weight: 500;
       border-radius: 6px;
       padding: 6px 12px;
+      text-align: center;
+      font-size: 0.8rem;
+    }
+
+    .badge-status-pending {
+      background-color: #fef3c7;
+      color: #d97706;
     }
 
     .badge-status-approved {
       background-color: #dbeafe;
       color: #2563eb;
-      font-weight: 500;
-      border-radius: 6px;
-      padding: 6px 12px;
     }
 
     .badge-status-completed {
       background-color: #dcfce7;
       color: #16a34a;
-      font-weight: 500;
-      border-radius: 6px;
-      padding: 6px 12px;
     }
 
     .badge-status-rejected {
       background-color: #fee2e2;
       color: #dc2626;
-      font-weight: 500;
-      border-radius: 6px;
-      padding: 6px 12px;
     }
 
     /* Action Buttons */
@@ -214,20 +220,12 @@
       text-decoration: none;
     }
 
+    /* ==========================================================
+       ปรับแต่ง UI สำหรับหน้าจอมือถือ (Responsive CSS for Mobile)
+       ========================================================== */
     @media (max-width: 768px) {
 
-      /* 1. จัดระเบียบช่องค้นหาและตัวกรองให้เรียงเป็นแถวเดี่ยว ไม่เหลือช่องว่าง */
-      .filter-container,
-      .filter-grid,
-      select,
-      input {
-        width: 100% !important;
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 8px !important;
-      }
-
-      /* 2. ทำให้ตารางรองรับการเลื่อนซ้าย-ขวาได้แบบลื่นไหล ไม่บีบตัว */
+      /* 1. ตารางมีขนาดพอดี และสไลด์ซ้าย-ขวาได้แบบลื่นไหล */
       .table-responsive,
       .table-container {
         width: 100% !important;
@@ -236,36 +234,21 @@
         border-radius: 8px;
       }
 
-      /* 3. แก้ไขป้ายสถานะ (Badge) ห้ามตัดบรรทัดเป็นแนวตั้ง */
-      .badge,
-      .status-badge,
-      table td {
-        white-space: nowrap !important;
-        /* ห้ามตัดข้อความขึ้นบรรทัดใหม่ */
+      /* กำหนดความกว้างขั้นต่ำ เพื่อไม่ให้ตารางโดนบีบจนตัวหนังสือแนวตั้ง */
+      .table {
+        min-width: 650px !important;
       }
 
-      /* 4. ปรับขนาดตัวอักษรและระยะขอบภายในตารางให้กระชับพอดีมือถือ */
-      table th,
-      table td {
-        padding: 10px 8px !important;
-        font-size: 12px !important;
-        vertical-align: middle !important;
+      /* 2. จัดระยะห่างช่องค้นหาและตัวกรองให้พอดี */
+      .filter-box .row {
+        row-gap: 10px !important;
       }
 
-      /* 5. จัดการปุ่มกด (อนุมัติ/ปฏิเสธ/ดูรายละเอียด) ให้เรียงกันสวยงาม */
-      .action-buttons,
-      td:last-child {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 4px !important;
-        min-width: 100px;
-      }
-
-      .btn {
-        width: 100% !important;
-        font-size: 11px !important;
-        padding: 6px 8px !important;
-        text-align: center;
+      /* 3. จัดการระยะปุ่มในตารางมือถือ */
+      .btn-approve,
+      .btn-reject {
+        padding: 6px 10px !important;
+        font-size: 0.75rem !important;
       }
     }
   </style>
