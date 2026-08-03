@@ -4,7 +4,14 @@ const multer = require('multer');
 const path = require('path');
 const cors = require('cors');
 const session = require('express-session');
+const fs = require('fs');
 
+// 💡 สั่งให้ Node.js ตรวจสอบและสร้างโฟลเดอร์ uploads อัตโนมัติถ้ายังไม่มี
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+    console.log('📁 Created uploads folder successfully!');
+}
 const app = express();
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
