@@ -209,7 +209,27 @@ app.post('/api/requests/:id/complete', upload.single('after_image'), (req, res) 
     res.json({ message: 'ปิดงาน (Completed) สำเร็จแล้ว!' });
   });
 });
+// 💡 API สำหรับสั่งลบงานที่ปิดแล้วย้อนหลังเกิน 1 เดือน
+app.delete('/api/admin/clean-closed-jobs', (req, res) => {
+    const sql = `
+        DELETE FROM kaizen_requests 
+        WHERE status IN ('ปิดงานแล้ว', 'CLOSED_FOREMAN') 
+          AND created_at < NOW() - INTERVAL 1 MONTH
+    `;
 
+    db.query(sql, (err, result) => {
+        if (err) {
+            console.error('❌ Error deleting old jobs:', err);
+            return res.status(500).json({ success: false, message: 'เกิดข้อผิดพลาดในการลบข้อมูล' });
+        }
+        
+        console.log(`🧹 Deleted ${result.affectedRows} closed jobs.`);
+        res.json({ 
+            success: true, 
+            message: `ลบข้อมูลงานที่ปิดแล้วเกิน 1 เดือน เรียบร้อยแล้ว (${result.affectedRows} รายการ)` 
+        });
+    });
+});
 
 // 1. สั่งให้ Express อ่านไฟล์ static (HTML, CSS, รูปภาพ) จากโฟลเดอร์หลัก
 app.use(express.static(__dirname));
