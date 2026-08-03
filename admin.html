@@ -213,6 +213,61 @@
       font-weight: 600;
       text-decoration: none;
     }
+
+    @media (max-width: 768px) {
+
+      /* 1. จัดระเบียบช่องค้นหาและตัวกรองให้เรียงเป็นแถวเดี่ยว ไม่เหลือช่องว่าง */
+      .filter-container,
+      .filter-grid,
+      select,
+      input {
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+      }
+
+      /* 2. ทำให้ตารางรองรับการเลื่อนซ้าย-ขวาได้แบบลื่นไหล ไม่บีบตัว */
+      .table-responsive,
+      .table-container {
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 8px;
+      }
+
+      /* 3. แก้ไขป้ายสถานะ (Badge) ห้ามตัดบรรทัดเป็นแนวตั้ง */
+      .badge,
+      .status-badge,
+      table td {
+        white-space: nowrap !important;
+        /* ห้ามตัดข้อความขึ้นบรรทัดใหม่ */
+      }
+
+      /* 4. ปรับขนาดตัวอักษรและระยะขอบภายในตารางให้กระชับพอดีมือถือ */
+      table th,
+      table td {
+        padding: 10px 8px !important;
+        font-size: 12px !important;
+        vertical-align: middle !important;
+      }
+
+      /* 5. จัดการปุ่มกด (อนุมัติ/ปฏิเสธ/ดูรายละเอียด) ให้เรียงกันสวยงาม */
+      .action-buttons,
+      td:last-child {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 4px !important;
+        min-width: 100px;
+      }
+
+      .btn {
+        width: 100% !important;
+        font-size: 11px !important;
+        padding: 6px 8px !important;
+        text-align: center;
+      }
+    }
   </style>
 </head>
 
