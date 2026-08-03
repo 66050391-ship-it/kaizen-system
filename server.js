@@ -238,7 +238,109 @@ app.use(express.static(__dirname));
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html')); 
 });
+// =========================================================
+// 💡 API สำหรับสร้างหน้า PDF สำรองข้อมูลงานที่ปิดแล้ว
+// =========================================================
+app.get('/api/admin/closed-jobs-pdf', (req, res) => {
+    const sql = `
+        SELECT * FROM kaizen_requests 
+        WHERE status IN ('ปิดงานแล้ว', 'CLOSED_FOREMAN', 'อนุมัติแล้ว') 
+        ORDER BY created_at DESC
+    `;
 
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error('❌ Database error:', err);
+            return res.status(500).send('เกิดข้อผิดพลาดในการดึงข้อมูลจากฐานข้อมูล');
+        }
+
+        // สร้างหน้า HTML รายงานสำหรับสั่งพิมพ์/บันทึก PDF
+        let html = `
+        <!DOCTYPE html>
+        <html lang="th">
+        <head>
+            <meta charset="UTF-8">
+            <title>รายงานสำรองข้อมูล Kaizen งานที่ปิดแล้ว</title>
+            <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600&display=swap" rel="stylesheet">
+            <style>
+                body { font-family: 'Prompt', sans-serif; padding: 20px; color: #1e293b; }
+                .header { text-align: center; margin-bottom: 20px; }
+                .header h2 { margin: 0; color: #0f172a; }
+                .header p { margin: 5px 0; color: #64748b; font-size: 13px; }
+                table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                th, td { border: 1px solid #cbd5e1; padding: 8px 10px; font-size: 12px; text-align: left; }
+                th { background-color: #f1f5f9; color: #334155; font-weight: 600; }
+                tr:nth-child(even) { background-color: #f8fafc; }
+                .badge-success { color: #16a34a; font-weight: 600; }
+                @media print {
+                    @page { size: A4 landscape; margin: 10mm; }
+                    .no-print { display: none; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="no-print" style="text-align: right; margin-bottom: 15px;">
+                <button onclick="window.print()" style="padding: 8px 16px; background: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer; font-family: 'Prompt';">
+                    🖨️ บันทึกเป็น PDF / พิมพ์
+                </button>
+            </div>
+            
+            <div class="header">
+                <h2>📋 รายงานสำรองข้อมูล Kaizen (งานที่เสร็จแล้ว)</h2>
+                <p>พิมพ์เมื่อวันที่: ${new Date().toLocaleDateString('th-TH')}</p>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>รหัสงาน</th>
+                        <th>ชื่อผู้แจ้ง</th>
+                        <th>แผนก</th>
+                        <th>พื้นที่/เครื่องจักร</th>
+                        <th>ประเภทงาน</th>
+                        <th>สถานะ</th>
+                        <th>วันที่แจ้งงาน</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        if (!results || results.length === 0) {
+            html += `<tr><td colspan="7" style="text-align:center;">ไม่พบข้อมูลงานที่ปิดแล้วในระบบ</td></tr>`;
+        } else {
+            results.forEach(row => {
+                const dateStr = row.created_at ? new Date(row.created_at).toLocaleDateString('th-TH') : '-';
+                html += `
+                    <tr>
+                        <td><b>#KR-${row.id.toString().padStart(4, '0')}</b></td>
+                        <td>${row.reporter_name || '-'}</td>
+                        <td>${row.department || '-'}</td>
+                        <td>${row.location || '-'}</td>
+                        <td>${row.job_type || row.work_type || '-'}</td>
+                        <td><span class="badge-success">${row.status}</span></td>
+                        <td>${dateStr}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        html += `
+                </tbody>
+            </table>
+
+            <script>
+                // สั่งเปิดหน้าต่างสั่งพิมพ์ (Save PDF) อัตโนมัติเมื่อโหลดหน้าเสร็จ
+                window.onload = function() {
+                    setTimeout(() => { window.print(); }, 500);
+                };
+            </script>
+        </body>
+        </html>
+        `;
+
+        res.send(html);
+    });
+});
 const PORT = process.env.PORT ||3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
